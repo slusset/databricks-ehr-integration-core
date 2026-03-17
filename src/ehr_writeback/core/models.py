@@ -33,11 +33,20 @@ class Observation(BaseModel):
     to analytics-derived clinical values (scores, flags, measures).
     """
 
-    patient_id: str = Field(description="Patient identifier in the EHR (MRN or FHIR ID)")
-    encounter_id: str | None = Field(default=None, description="Encounter/visit context")
-    code: str = Field(description="LOINC or local code for the observation type")
+    patient_id: str = Field(
+        description="Patient identifier in the EHR (MRN or FHIR ID)",
+    )
+    encounter_id: str | None = Field(
+        default=None,
+        description="Encounter/visit context",
+    )
+    code: str = Field(
+        description="LOINC or local code for the observation type",
+    )
     code_system: str = Field(default="http://loinc.org")
-    display_name: str = Field(description="Human-readable name (e.g. 'Sepsis Risk Score')")
+    display_name: str = Field(
+        description="Human-readable name (e.g. 'Sepsis Risk Score')",
+    )
     value: float | str | bool = Field(description="Observation value")
     unit: str | None = Field(default=None, description="UCUM unit if numeric")
     effective_datetime: datetime = Field(default_factory=datetime.utcnow)

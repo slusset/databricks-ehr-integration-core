@@ -8,9 +8,8 @@ exists with status=SUCCESS, the write is skipped.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
 
-from ehr_writeback.core.models import WritebackResult, WritebackStatus
+from ehr_writeback.core.models import WritebackResult
 from ehr_writeback.core.ports import IdempotencyPort
 from ehr_writeback.infrastructure.delta_store import DeltaStore
 

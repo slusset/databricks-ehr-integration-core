@@ -26,7 +26,9 @@ class EpicBackendJWTAuth(AuthPort):
 
     client_id: str
     private_key_pem: str  # PEM-encoded RSA private key
-    token_endpoint: str  # e.g. https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token
+    token_endpoint: (
+        str  # e.g. https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token
+    )
     _access_token: str | None = field(default=None, repr=False)
     _token_expires_at: float = field(default=0.0, repr=False)
 
@@ -52,7 +54,9 @@ class EpicBackendJWTAuth(AuthPort):
                 self.token_endpoint,
                 data={
                     "grant_type": "client_credentials",
-                    "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                    "client_assertion_type": (
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+                    ),
                     "client_assertion": assertion,
                 },
             )

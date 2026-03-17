@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from dataclasses import dataclass
 
 import httpx
@@ -108,7 +107,9 @@ class EpicFHIRAdapter(EHRWritebackPort):
                     status=WritebackStatus.FAILED,
                     ehr_system=EHRSystem.EPIC,
                     idempotency_key=idem_key,
-                    error_message=f"HTTP {exc.response.status_code}: {exc.response.text}",
+                    error_message=(
+                        f"HTTP {exc.response.status_code}: {exc.response.text}"
+                    ),
                 )
             except httpx.RequestError as exc:
                 return WritebackResult(

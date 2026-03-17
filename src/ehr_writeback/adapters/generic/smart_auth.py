@@ -51,7 +51,9 @@ class SMARTOnFHIRAuth(AuthPort):
                 data={
                     "grant_type": "client_credentials",
                     "scope": self.scope,
-                    "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                    "client_assertion_type": (
+                        "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+                    ),
                     "client_assertion": assertion,
                 },
             )

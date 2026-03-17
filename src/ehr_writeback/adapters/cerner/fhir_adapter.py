@@ -113,7 +113,9 @@ class CernerFHIRAdapter(EHRWritebackPort):
                     status=WritebackStatus.FAILED,
                     ehr_system=EHRSystem.CERNER,
                     idempotency_key=idem_key,
-                    error_message=f"HTTP {exc.response.status_code}: {exc.response.text}",
+                    error_message=(
+                        f"HTTP {exc.response.status_code}: {exc.response.text}"
+                    ),
                 )
             except httpx.RequestError as exc:
                 return WritebackResult(
