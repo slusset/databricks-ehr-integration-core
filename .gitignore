@@ -34,6 +34,7 @@ terraform/.terraform.lock.hcl
 # Secrets — never commit
 .env
 .env.*
+.envrc
 *.pem
 *.key
 credentials.json
