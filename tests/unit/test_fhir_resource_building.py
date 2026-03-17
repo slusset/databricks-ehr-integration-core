@@ -48,7 +48,9 @@ def test_cerner_fhir_resource_structure():
 
 def test_generic_fhir_resource_with_boolean():
     mock_auth = AsyncMock()
-    adapter = GenericFHIRR4Adapter(base_url="https://example.com/fhir/R4", auth=mock_auth)
+    adapter = GenericFHIRR4Adapter(
+        base_url="https://example.com/fhir/R4", auth=mock_auth
+    )
     obs = Observation(
         patient_id="P300",
         code="sepsis-flag",
@@ -64,7 +66,9 @@ def test_generic_fhir_resource_with_boolean():
 
 def test_generic_fhir_resource_with_string():
     mock_auth = AsyncMock()
-    adapter = GenericFHIRR4Adapter(base_url="https://example.com/fhir/R4", auth=mock_auth)
+    adapter = GenericFHIRR4Adapter(
+        base_url="https://example.com/fhir/R4", auth=mock_auth
+    )
     obs = Observation(
         patient_id="P400",
         code="risk-level",
