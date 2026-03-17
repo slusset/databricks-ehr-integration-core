@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    ehr_writeback_pipeline:
+      name: "ehr-writeback-pipeline"
+      target: ${var.catalog}.${var.schema}
+      libraries:
+        - notebook:
+            path: ../src/ehr_writeback/pipelines/writeback_pipeline.py
+      configuration:
+        ehr_writeback.catalog: ${var.catalog}
+        ehr_writeback.schema: ${var.schema}
+      continuous: false
+      channel: PREVIEW

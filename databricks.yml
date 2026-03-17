@@ -1,0 +1,34 @@
+bundle:
+  name: ehr-writeback
+
+workspace:
+  host: ${var.databricks_host}
+
+variables:
+  databricks_host:
+    description: Databricks workspace URL
+  catalog:
+    description: Unity Catalog name
+    default: ehr_writeback
+  schema:
+    description: Schema within the catalog
+    default: default
+
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      catalog: ehr_writeback_dev
+
+  staging:
+    variables:
+      catalog: ehr_writeback_staging
+
+  prod:
+    mode: production
+    variables:
+      catalog: ehr_writeback
+
+include:
+  - resources/*.yml

@@ -1,0 +1,24 @@
+resources:
+  jobs:
+    ehr_writeback_job:
+      name: "ehr-writeback-batch"
+      schedule:
+        quartz_cron_expression: "0 0 */4 * * ?"  # every 4 hours
+        timezone_id: America/New_York
+      tasks:
+        - task_key: run_writeback_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.ehr_writeback_pipeline.id}
+
+    ehr_writeback_dead_letter_reprocess:
+      name: "ehr-writeback-dead-letter-reprocess"
+      schedule:
+        quartz_cron_expression: "0 0 8 * * ?"  # daily at 8am
+        timezone_id: America/New_York
+      tasks:
+        - task_key: reprocess_dead_letters
+          notebook_task:
+            notebook_path: ../src/ehr_writeback/pipelines/reprocess_dead_letters.py
+          libraries:
+            - pypi:
+                package: ehr-writeback
