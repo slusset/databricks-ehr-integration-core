@@ -3,8 +3,8 @@
 from datetime import datetime, timezone
 from unittest.mock import AsyncMock
 
-from ehr_writeback.adapters.epic.fhir_adapter import EpicFHIRAdapter
 from ehr_writeback.adapters.cerner.fhir_adapter import CernerFHIRAdapter
+from ehr_writeback.adapters.epic.fhir_adapter import EpicFHIRAdapter
 from ehr_writeback.adapters.generic.fhir_r4_adapter import GenericFHIRR4Adapter
 from ehr_writeback.core.models import Observation
 
@@ -81,7 +81,7 @@ def test_generic_fhir_resource_with_string():
 
 
 def test_idempotency_keys_differ_across_adapters():
-    """Same observation should produce different keys per adapter to avoid collisions."""
+    """Same observation produces different keys per adapter."""
     obs = _sample_observation()
     epic_key = EpicFHIRAdapter._idempotency_key(obs)
     cerner_key = CernerFHIRAdapter._idempotency_key(obs)

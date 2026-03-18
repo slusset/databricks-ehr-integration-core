@@ -9,8 +9,6 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-import pytest
-
 from ehr_writeback.core.models import (
     DeadLetter,
     EHRSystem,
@@ -30,7 +28,6 @@ from ehr_writeback.core.ports import (
     EHRWritebackPort,
     IdempotencyPort,
 )
-
 
 # ── In-memory port implementations for testing ─────────────
 

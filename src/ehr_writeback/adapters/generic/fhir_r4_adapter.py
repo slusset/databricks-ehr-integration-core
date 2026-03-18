@@ -77,6 +77,15 @@ class GenericFHIRR4Adapter(EHRWritebackPort):
         raw = f"fhir:{obs.patient_id}:{obs.code}:{obs.effective_datetime.isoformat()}"
         return hashlib.sha256(raw.encode()).hexdigest()
 
+    def _auth_headers(self, token: str) -> dict[str, str]:
+        headers = {
+            "Content-Type": "application/fhir+json",
+            "Accept": "application/fhir+json",
+        }
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        return headers
+
     async def write_observation(self, observation: Observation) -> WritebackResult:
         token = await self.auth.authenticate()
         fhir_resource = self._build_fhir_observation(observation)
@@ -87,11 +96,7 @@ class GenericFHIRR4Adapter(EHRWritebackPort):
                 response = await client.post(
                     f"{self.base_url}/Observation",
                     json=fhir_resource,
-                    headers={
-                        "Authorization": f"Bearer {token}",
-                        "Content-Type": "application/fhir+json",
-                        "Accept": "application/fhir+json",
-                    },
+                    headers=self._auth_headers(token),
                     timeout=30.0,
                 )
                 response.raise_for_status()
@@ -129,7 +134,7 @@ class GenericFHIRR4Adapter(EHRWritebackPort):
             async with httpx.AsyncClient() as client:
                 response = await client.get(
                     f"{self.base_url}/metadata",
-                    headers={"Authorization": f"Bearer {token}"},
+                    headers=self._auth_headers(token),
                     timeout=10.0,
                 )
                 return response.status_code == 200
