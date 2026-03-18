@@ -37,14 +37,39 @@ Hexagonal (ports-and-adapters) design with two deployment targets:
 ## Quick Start
 
 ```bash
-pip install -e ".[dev]"
-pytest
+uv sync            # install dependencies
+uv run pytest      # run unit tests
+```
+
+### Run the sepsis risk score example
+
+Generates synthetic patients, scores them for sepsis risk (SIRS + qSOFA),
+and writes the results to a public FHIR R4 test server:
+
+```bash
+uv run python examples/sepsis_risk_writeback.py
+```
+
+Output:
+```
+[1/4] Generating synthetic patient cohort...
+[2/4] Scoring patients for sepsis risk...
+  🟢 Barbara Harris: LOW
+  🟡 Daniel Moore: MODERATE
+  🟠 Charles Harris: HIGH
+  🔴 Mary Thompson: CRITICAL
+[3/4] Creating Patient resources on FHIR server...
+[4/4] Writing sepsis scores to FHIR server...
+
+Results:
+  Succeeded:    20
+  Success rate: 100%
 ```
 
 ### With Databricks support
 
 ```bash
-pip install -e ".[databricks,dev]"
+uv sync --extra databricks
 ```
 
 ### Deploy to Databricks
