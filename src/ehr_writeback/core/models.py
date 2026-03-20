@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
@@ -49,7 +49,9 @@ class Observation(BaseModel):
     )
     value: float | str | bool = Field(description="Observation value")
     unit: str | None = Field(default=None, description="UCUM unit if numeric")
-    effective_datetime: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    effective_datetime: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     source_system: str = Field(
         default="ehr-writeback",
         description="Identifier for the analytics system producing this value",
@@ -70,7 +72,7 @@ class WritebackResult(BaseModel):
         default=None, description="ID assigned by the EHR (FHIR resource ID)"
     )
     idempotency_key: str = Field(description="Key used for exactly-once semantics")
-    attempted_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    attempted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     error_message: str | None = None
     retry_count: int = 0
 
@@ -83,5 +85,7 @@ class DeadLetter(BaseModel):
     ehr_system: EHRSystem
     last_error: str
     retry_count: int
-    dead_lettered_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    dead_lettered_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     reprocessed: bool = False

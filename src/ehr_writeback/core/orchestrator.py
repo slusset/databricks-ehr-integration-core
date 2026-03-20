@@ -245,7 +245,11 @@ class WritebackOrchestrator:
                     break
 
         # 4. Exhausted retries — dead-letter
-        error_msg = last_result.error_message if last_result else "Unknown error"
+        error_msg = (
+            last_result.error_message or "Unknown error"
+            if last_result
+            else "Unknown error"
+        )
         dead_letter = DeadLetter(
             observation=observation,
             idempotency_key=idem_key,
