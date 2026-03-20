@@ -1,0 +1,21 @@
+id: pypi-publishing
+type: capability
+description: |
+  Publish the ehr-writeback package to PyPI from GitHub using trusted publishing,
+  so public consumers can install a tagged release with standard Python tooling.
+scope:
+  personas:
+    - specs/personas/release-maintainer.md
+  journeys:
+    - specs/journeys/publish-python-package.md
+  stories:
+    - specs/stories/release/publish-package-to-pypi.md
+  models:
+    - specs/models/release/package-release.model.yaml
+    - specs/models/release/package-release.lifecycle.yaml
+  features:
+    - specs/features/release/publish-package.feature
+  contracts:
+    - specs/contracts/workflows/pypi-publish.contract.yaml
+  fixtures:
+    - specs/fixtures/release/pypi-publish-success.json

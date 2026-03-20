@@ -10,7 +10,7 @@ HAPI is a public test server — no auth required, data is ephemeral.
 from __future__ import annotations
 
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import httpx
 import pytest
@@ -79,7 +79,7 @@ def sample_observation(test_patient_id: str) -> Observation:
         display_name="Oxygen saturation (SpO2)",
         value=97.5,
         unit="%",
-        effective_datetime=datetime.now(UTC),
+        effective_datetime=datetime.now(timezone.utc),
         source_system="ehr-writeback-integration-test",
         metadata={"test": True},
     )
@@ -148,7 +148,7 @@ async def test_write_string_value_observation(
         code_system="http://loinc.org",
         display_name="Readmission Risk Level",
         value="moderate",
-        effective_datetime=datetime.now(UTC),
+        effective_datetime=datetime.now(timezone.utc),
     )
     result = await adapter.write_observation(obs)
 

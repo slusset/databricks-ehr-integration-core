@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__github__create_issue",
+      "mcp__github__update_issue"
+    ]
+  }
+}

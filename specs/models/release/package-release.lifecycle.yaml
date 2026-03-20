@@ -1,0 +1,51 @@
+id: package-release-lifecycle
+type: model
+entity: PackageRelease
+description: "State transitions for building and publishing the ehr-writeback package"
+sources:
+  stories:
+    - specs/stories/release/publish-package-to-pypi.md
+  journeys:
+    - specs/journeys/publish-python-package.md
+initial_state: pending
+states:
+  pending:
+    description: "A tag or release exists but distributable artifacts have not yet been confirmed"
+    terminal: false
+  built:
+    description: "Both source and wheel artifacts were built successfully"
+    terminal: false
+  published:
+    description: "Artifacts were published successfully to PyPI"
+    terminal: true
+  failed:
+    description: "The workflow could not build or publish the release"
+    terminal: true
+transitions:
+  build:
+    from: pending
+    to: built
+    trigger: workflow
+    description: "Release workflow builds both sdist and wheel artifacts"
+    guards:
+      - source-distribution-built
+      - wheel-built
+  publish:
+    from: built
+    to: published
+    trigger: workflow
+    description: "Trusted publishing uploads the built artifacts to PyPI"
+    guards:
+      - trusted-publishing-configured
+  fail-before-publish:
+    from: pending
+    to: failed
+    trigger: workflow
+    description: "Artifact build or release validation fails before publish"
+    guards: []
+  fail-during-publish:
+    from: built
+    to: failed
+    trigger: workflow
+    description: "PyPI publish step fails after artifacts are built"
+    guards: []

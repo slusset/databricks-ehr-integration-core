@@ -1,0 +1,64 @@
+id: package-release
+type: model
+entity: PackageRelease
+aggregate: Release
+description: |
+  Represents a tagged repository revision being built and published as a public
+  Python package release for ehr-writeback.
+sources:
+  stories:
+    - specs/stories/release/publish-package-to-pypi.md
+  journeys:
+    - specs/journeys/publish-python-package.md
+identity:
+  field: version
+  type: string
+  format: pep440
+  example: "0.1.0"
+attributes:
+  version:
+    type: string
+    required: true
+    constraints:
+      minLength: 1
+    description: "Package version derived from the tagged revision"
+  gitRef:
+    type: string
+    required: true
+    description: "Git tag or release ref that triggered the publish workflow"
+  sourceDistributionBuilt:
+    type: boolean
+    required: true
+    description: "Whether the source distribution artifact was built successfully"
+  wheelBuilt:
+    type: boolean
+    required: true
+    description: "Whether the wheel artifact was built successfully"
+  publishMethod:
+    type: enum
+    required: true
+    values: [trusted-publishing]
+    description: "The allowed publish mechanism for PyPI releases"
+  status:
+    type: enum
+    required: true
+    values: [pending, built, published, failed]
+    description: "Current release workflow state"
+  publishedPackageName:
+    type: string
+    required: true
+    description: "Expected package name on PyPI"
+    example: "ehr-writeback"
+rules:
+  - id: release-requires-both-artifacts
+    description: "A package release cannot be published unless both sdist and wheel artifacts exist"
+    enforced: workflow
+  - id: release-uses-trusted-publishing
+    description: "PyPI publication must use trusted publishing rather than static repository secrets"
+    enforced: workflow
+  - id: package-name-stable
+    description: "Published package name must remain ehr-writeback for install documentation and badge references"
+    enforced: metadata
+versioning:
+  tracked: true
+  fields: [status, version, gitRef]
