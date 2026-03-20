@@ -1,0 +1,171 @@
+name: Release Publish
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-publish-${{ github.event.release.tag_name || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      package_version: ${{ steps.version.outputs.package_version }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Resolve release version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          python - <<'PY'
+          import os
+          import tomllib
+          from pathlib import Path
+
+          pyproject = tomllib.loads(Path("pyproject.toml").read_text())
+          package_version = pyproject["project"]["version"]
+          raw_tag = os.environ["RELEASE_TAG"] if os.environ["EVENT_NAME"] == "release" else os.environ["REF_NAME"]
+          normalized_tag = raw_tag.removeprefix("v")
+
+          if normalized_tag != package_version:
+              raise SystemExit(
+                  f"Tag version {raw_tag!r} does not match pyproject version {package_version!r}"
+              )
+
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          with output_path.open("a", encoding="utf-8") as fh:
+              print(f"package_version={package_version}", file=fh)
+          PY
+
+      - name: Build distribution artifacts
+        run: uv build
+
+      - name: Validate distribution artifacts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          dist = Path("dist")
+          wheels = list(dist.glob("*.whl"))
+          sdists = list(dist.glob("*.tar.gz"))
+
+          if not wheels or not sdists:
+              raise SystemExit(
+                  "Both wheel and source distribution artifacts are required in dist/"
+              )
+
+          print("Built wheel artifacts:", [path.name for path in wheels])
+          print("Built source artifacts:", [path.name for path in sdists])
+          PY
+
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      already_published: ${{ steps.pypi-status.outputs.already_published }}
+    steps:
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Check whether version already exists on PyPI
+        id: pypi-status
+        env:
+          PACKAGE_NAME: ehr-writeback
+          PACKAGE_VERSION: ${{ needs.build.outputs.package_version }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          package_name = os.environ["PACKAGE_NAME"]
+          package_version = os.environ["PACKAGE_VERSION"]
+          already_published = "false"
+
+          try:
+              with urllib.request.urlopen(
+                  f"https://pypi.org/pypi/{package_name}/json",
+                  timeout=15,
+              ) as response:
+                  payload = json.load(response)
+          except urllib.error.HTTPError as exc:
+              if exc.code != 404:
+                  raise
+          else:
+              if package_version in payload.get("releases", {}):
+                  already_published = "true"
+
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as fh:
+              print(f"already_published={already_published}", file=fh)
+          PY
+
+      - name: Publish package to PyPI
+        if: steps.pypi-status.outputs.already_published != 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+      - name: Report existing release
+        if: steps.pypi-status.outputs.already_published == 'true'
+        run: |
+          echo "Version ${{ needs.build.outputs.package_version }} is already present on PyPI."
+          echo "Skipping duplicate publish for this tag."
+
+  verify-install:
+    runs-on: ubuntu-latest
+    needs: [build, publish]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify install from PyPI
+        env:
+          PACKAGE_VERSION: ${{ needs.build.outputs.package_version }}
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "ehr-writeback==${PACKAGE_VERSION}"
+          python - <<'PY'
+          import ehr_writeback
+
+          print(getattr(ehr_writeback, "__file__", "ehr_writeback import succeeded"))
+          PY
