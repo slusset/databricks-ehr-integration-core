@@ -1,5 +1,7 @@
 # ehr-writeback
 
+[![PyPI version](https://img.shields.io/pypi/v/ehr-writeback.svg)](https://pypi.org/project/ehr-writeback/)
+
 Open-source EHR write-back integration framework. Closes the loop from healthcare analytics back to clinical workflow via FHIR.
 
 ## What it does
@@ -36,10 +38,18 @@ Hexagonal (ports-and-adapters) design with two deployment targets:
 
 ## Quick Start
 
+Install from PyPI:
+
+```bash
+pip install ehr-writeback
+```
+
 ```bash
 uv sync            # install dependencies
 uv run pytest      # run unit tests
 ```
+
+To publish a release, create a GitHub release for a `v*` tag whose version matches `pyproject.toml`. The release workflow builds the wheel and source distribution, publishes through PyPI trusted publishing, and verifies `pip install ehr-writeback==<version>` in a clean environment.
 
 ### Run the sepsis risk score example
 
