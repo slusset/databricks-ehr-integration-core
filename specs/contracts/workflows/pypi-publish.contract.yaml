@@ -1,0 +1,45 @@
+id: pypi-publish-workflow
+type: workflow-contract
+story: specs/stories/release/publish-package-to-pypi.md
+journey: specs/journeys/publish-python-package.md
+feature: specs/features/release/publish-package.feature
+summary: |
+  Contract for the GitHub Actions workflow that builds and publishes the
+  ehr-writeback package to PyPI using trusted publishing.
+trigger:
+  any_of:
+    - release.published
+    - push.tags: "v*"
+permissions:
+  contents: read
+  id-token: write
+inputs:
+  package_name: ehr-writeback
+  version_source: pyproject.toml
+required_steps:
+  - name: checkout-source
+    outcome: "Tagged source revision is available to the workflow"
+  - name: setup-python-build-env
+    outcome: "Python build tooling is installed"
+  - name: build-artifacts
+    outcome: "Both sdist and wheel artifacts are created"
+  - name: publish-to-pypi
+    outcome: "Artifacts are uploaded via trusted publishing"
+  - name: verify-install
+    outcome: "A clean environment can install the just-published version"
+outputs:
+  published_package_name: ehr-writeback
+  published_version: semantic version from pyproject tag alignment
+  artifact_set:
+    required:
+      - sdist
+      - wheel
+failure_conditions:
+  - missing id-token:write permission
+  - missing trusted publisher configuration in PyPI
+  - missing wheel artifact
+  - missing source distribution artifact
+  - pip install verification fails
+traceability:
+  capability: specs/capabilities/pypi-publishing.capability.yaml
+  model: specs/models/release/package-release.model.yaml
