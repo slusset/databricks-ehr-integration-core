@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a defect, regression, or incorrect behavior
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug report. Please provide enough detail for someone
+        else to reproduce the issue locally.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and why is it a bug?
+      placeholder: A short description of the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps needed to reproduce the issue.
+      placeholder: |
+        1. Run ...
+        2. Configure ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: What should have happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: What happened instead?
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12.2"
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Databricks runtime, CI runner, or other relevant environment info
+      placeholder: macOS 15 / Ubuntu 24.04 / Databricks Runtime 14.3
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Relevant logs, screenshots, stack traces, or links
+      render: shell

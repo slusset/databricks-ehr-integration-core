@@ -1,0 +1,19 @@
+site_name: ehr-writeback
+site_description: Open-source EHR write-back integration framework for FHIR-based clinical workflows
+site_url: https://slusset.github.io/databricks-ehr-integration-core/
+repo_url: https://github.com/slusset/databricks-ehr-integration-core
+repo_name: slusset/databricks-ehr-integration-core
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
