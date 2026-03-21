@@ -1,6 +1,6 @@
 [project]
 name = "ehr-writeback"
-version = "0.1.0"
+version = "0.1.0a1"
 description = "Open-source EHR write-back integration framework — closes the loop from analytics to clinical workflow via FHIR"
 readme = "README.md"
 license = "Apache-2.0"
