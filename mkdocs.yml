@@ -13,6 +13,7 @@ nav:
   - Overview: index.md
   - Getting Started: getting-started.md
   - Architecture: architecture.md
+  - Databricks Validation: databricks-validation.md
 markdown_extensions:
   - admonition
   - attr_list
