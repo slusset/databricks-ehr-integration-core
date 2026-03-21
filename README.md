@@ -86,7 +86,7 @@ uv sync --extra databricks
 
 ```bash
 pip install databricks-cli
-databricks bundle deploy -t dev
+databricks bundle deploy -t dev --var="catalog=<your_catalog>"
 ```
 
 For the end-to-end DLT validation flow, including demo setup and evidence

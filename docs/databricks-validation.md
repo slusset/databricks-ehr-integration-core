@@ -16,10 +16,16 @@ This runbook captures the repo-side steps for issue `#6`:
 
 ## Deploy the bundle
 
+Choose a catalog you can write to first. On Databricks Free Edition, that is
+often your workspace catalog rather than a custom catalog name.
+
 ```bash
-databricks bundle validate -t dev
-databricks bundle deploy -t dev
+databricks bundle validate -t dev --var="catalog=<your_catalog>"
+databricks bundle deploy -t dev --var="catalog=<your_catalog>"
 ```
+
+If `catalog` is omitted, bundle validation should fail fast instead of trying to
+deploy into a catalog that does not exist in your workspace.
 
 ## Seed demo data
 
