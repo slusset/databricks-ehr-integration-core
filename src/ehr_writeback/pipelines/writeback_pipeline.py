@@ -32,76 +32,26 @@ def writeback_staging():
 
 
 @dlt.table(
-    name="writeback_log",
-    comment="DLT-managed write-back log for staged observations",
+    name="writeback_ready",
+    comment="Validated observations ready for the writeback job",
 )
 @dlt.expect_or_drop("valid_patient", "patient_id IS NOT NULL")
 @dlt.expect_or_drop("valid_code", "observation_code IS NOT NULL")
-def writeback_log():
-    """Deduplication and result logging.
-
-    In the full implementation, this table is populated by the
-    write-back orchestrator after processing each observation.
-    This DLT definition ensures the table schema is managed by DLT
-    and participates in the pipeline lineage graph.
-    """
+def writeback_ready():
+    """Prepare observations for the side-effecting writeback notebook job."""
     return (
         dlt.read_stream("writeback_staging")
-        .withColumn(
-            "idempotency_key",
-            F.sha2(
-                F.concat_ws(
-                    ":",
-                    F.col("patient_id"),
-                    F.col("observation_code"),
-                    F.coalesce(
-                        F.col("effective_datetime").cast("string"),
-                        F.lit(""),
-                    ),
-                ),
-                256,
-            ),
-        )
-        .withColumn("ehr_system", F.lit("generic_fhir"))
-        .withColumn("ehr_resource_id", F.lit(None).cast("string"))
-        .withColumn("status", F.lit("pending"))
-        .withColumn("attempted_at", F.current_timestamp())
-        .withColumn("error_message", F.lit(None).cast("string"))
-        .withColumn("retry_count", F.lit(0))
+        .withColumn("queued_at", F.current_timestamp())
         .select(
-            "idempotency_key",
             "patient_id",
+            "encounter_id",
             F.col("observation_code"),
-            "ehr_system",
-            "ehr_resource_id",
-            "status",
-            "attempted_at",
-            "error_message",
-            "retry_count",
-        )
-    )
-
-
-@dlt.table(
-    name="dead_letters",
-    comment="DLT-managed view of dead-lettered observations",
-)
-def dead_letters():
-    """Expose dead-letter rows through the DLT lineage graph."""
-    return (
-        dlt.read("writeback_log")
-        .where(F.col("status") == F.lit("dead_lettered"))
-        .select(
-            "idempotency_key",
-            "patient_id",
-            F.col("observation_code"),
-            "ehr_system",
-            F.lit(None).cast("string").alias("observation_json"),
-            F.coalesce(F.col("error_message"), F.lit("Unknown error")).alias(
-                "last_error"
-            ),
-            "retry_count",
-            F.col("attempted_at").alias("dead_lettered_at"),
-            F.lit(False).alias("reprocessed"),
+            "code_system",
+            "display_name",
+            "value",
+            "unit",
+            "effective_datetime",
+            "source_system",
+            "queued_at",
         )
     )

@@ -34,6 +34,9 @@ class DeltaIdempotencyStore(IdempotencyPort):
         return df.count() > 0
 
     async def mark_processed(self, result: WritebackResult) -> None:
+        await self.upsert_result(result)
+
+    async def upsert_result(self, result: WritebackResult) -> None:
         row = self.store.spark.createDataFrame(
             [
                 {
