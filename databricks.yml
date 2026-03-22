@@ -7,6 +7,9 @@ variables:
   schema:
     description: Schema within the catalog
     default: default
+  fhir_base_url:
+    description: Base URL for the FHIR endpoint used by Databricks writeback jobs
+    default: https://hapi.fhir.org/baseR4
 
 targets:
   dev:

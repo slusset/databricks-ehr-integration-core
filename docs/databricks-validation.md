@@ -35,13 +35,16 @@ Run the `ehr-writeback-demo-setup` job after deployment. It creates or refreshes
 
 and seeds 10 deterministic observations for pipeline validation.
 
-## Execute the DLT pipeline
+## Execute the writeback path
 
-Run the `ehr-writeback-batch` job or trigger the `ehr-writeback-pipeline`
-pipeline directly in the Databricks workspace.
+Run the `ehr-writeback-batch` job. It:
+
+1. refreshes the DLT staging pipeline
+2. executes the writeback notebook against the configured FHIR endpoint
 
 Expected Delta outputs:
 
+- `${catalog}.${schema}.writeback_ready`
 - `${catalog}.${schema}.writeback_log`
 - `${catalog}.${schema}.dead_letters`
 

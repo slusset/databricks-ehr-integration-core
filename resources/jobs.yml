@@ -17,9 +17,19 @@ resources:
         quartz_cron_expression: "0 0 */4 * * ?"  # every 4 hours
         timezone_id: America/New_York
       tasks:
-        - task_key: run_writeback_pipeline
+        - task_key: prepare_writeback_batch
           pipeline_task:
             pipeline_id: ${resources.pipelines.ehr_writeback_pipeline.id}
+        - task_key: execute_writeback_batch
+          depends_on:
+            - task_key: prepare_writeback_batch
+          notebook_task:
+            notebook_path: ../src/ehr_writeback/pipelines/execute_writeback_batch.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              fhir_base_url: ${var.fhir_base_url}
+              batch_limit: "100"
 
     ehr_writeback_dead_letter_reprocess:
       name: "ehr-writeback-dead-letter-reprocess"
@@ -30,6 +40,10 @@ resources:
         - task_key: reprocess_dead_letters
           notebook_task:
             notebook_path: ../src/ehr_writeback/pipelines/reprocess_dead_letters.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              fhir_base_url: ${var.fhir_base_url}
 
     ehr_writeback_demo_validation:
       name: "ehr-writeback-demo-validation"
