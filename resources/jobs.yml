@@ -1,5 +1,16 @@
 resources:
   jobs:
+    ehr_writeback_demo_setup:
+      name: "ehr-writeback-demo-setup"
+      tasks:
+        - task_key: seed_demo_environment
+          notebook_task:
+            notebook_path: ../src/ehr_writeback/pipelines/setup_demo_environment.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              seed_count: "10"
+
     ehr_writeback_job:
       name: "ehr-writeback-batch"
       schedule:
@@ -19,6 +30,13 @@ resources:
         - task_key: reprocess_dead_letters
           notebook_task:
             notebook_path: ../src/ehr_writeback/pipelines/reprocess_dead_letters.py
-          libraries:
-            - pypi:
-                package: ehr-writeback
+
+    ehr_writeback_demo_validation:
+      name: "ehr-writeback-demo-validation"
+      tasks:
+        - task_key: summarize_demo_results
+          notebook_task:
+            notebook_path: ../src/ehr_writeback/pipelines/validate_demo_run.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}

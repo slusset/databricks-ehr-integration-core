@@ -2,7 +2,9 @@ resources:
   pipelines:
     ehr_writeback_pipeline:
       name: "ehr-writeback-pipeline"
-      target: ${var.catalog}.${var.schema}
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
       libraries:
         - notebook:
             path: ../src/ehr_writeback/pipelines/writeback_pipeline.py
