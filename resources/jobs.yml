@@ -13,6 +13,12 @@ resources:
 
     ehr_writeback_job:
       name: "ehr-writeback-batch"
+      environments:
+        - environment_key: writeback_env
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ${workspace.file_path}
       schedule:
         quartz_cron_expression: "0 0 */4 * * ?"  # every 4 hours
         timezone_id: America/New_York
@@ -23,6 +29,7 @@ resources:
         - task_key: execute_writeback_batch
           depends_on:
             - task_key: prepare_writeback_batch
+          environment_key: writeback_env
           notebook_task:
             notebook_path: ../src/ehr_writeback/pipelines/execute_writeback_batch.py
             base_parameters:
@@ -33,11 +40,18 @@ resources:
 
     ehr_writeback_dead_letter_reprocess:
       name: "ehr-writeback-dead-letter-reprocess"
+      environments:
+        - environment_key: writeback_env
+          spec:
+            environment_version: "4"
+            dependencies:
+              - ${workspace.file_path}
       schedule:
         quartz_cron_expression: "0 0 8 * * ?"  # daily at 8am
         timezone_id: America/New_York
       tasks:
         - task_key: reprocess_dead_letters
+          environment_key: writeback_env
           notebook_task:
             notebook_path: ../src/ehr_writeback/pipelines/reprocess_dead_letters.py
             base_parameters:
