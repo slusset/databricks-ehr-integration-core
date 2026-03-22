@@ -30,9 +30,6 @@ resources:
         - task_key: reprocess_dead_letters
           notebook_task:
             notebook_path: ../src/ehr_writeback/pipelines/reprocess_dead_letters.py
-          libraries:
-            - pypi:
-                package: ehr-writeback
 
     ehr_writeback_demo_validation:
       name: "ehr-writeback-demo-validation"

@@ -1,12 +1,7 @@
 bundle:
   name: ehr-writeback
 
-workspace:
-  host: ${var.databricks_host}
-
 variables:
-  databricks_host:
-    description: Databricks workspace URL
   catalog:
     description: Unity Catalog name to deploy into (for example, your workspace catalog on Databricks Free Edition)
   schema:
